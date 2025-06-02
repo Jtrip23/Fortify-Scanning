@@ -1,0 +1,41 @@
+stages:
+  - scan
+
+variables:
+  FMK_NEXUS: "fmk.nexus.onefiserv.net"
+  IMAGE_NAME: "$FMK_NEXUS/vendor/docker/fortifydocker/fortify-ci-tools:6.2.0-jdk-11"
+  BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
+  PACKAGE_NAME: "scan-package.zip"
+  SSC_URL: "https://fortify.fiserv.one/ssc"
+  SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_VERSION: "1.1"
+  FORTIFY_APPLICATION: "APM0004849"
+  FORTIFY_EMAIL: "APIHub@fiserv.com"
+
+fortify-scan:
+  stage: scan
+  image: "$IMAGE_NAME"
+  tags:
+    - apimhub
+  script:
+    - echo "Preparing Fortify scan package..."
+    - mkdir -p artifacts
+    - scancentral package -o "$PACKAGE_NAME" -bt none -exclude "**/dist/*.js"
+    - echo "Running Fortify scan and uploading package to SSC..."
+    - echo "scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -scan
+      -application "$FORTIFY_APPLICATION"
+      -version "$FORTIFY_VERSION"
+      -uptoken "$SSC_TOKEN"
+      -uploadzip "$PACKAGE_NAME"
+      -b "$BUILD_ID"
+      -bt none
+      -email "$FORTIFY_EMAIL""
+    - >
+      scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -scan
+      -application "$FORTIFY_APPLICATION"
+      -version "$FORTIFY_VERSION"
+      -uptoken "$SSC_TOKEN"
+      -uploadzip "$PACKAGE_NAME"
+      -b "$BUILD_ID"
+      -bt none
+      -email "$FORTIFY_EMAIL"
