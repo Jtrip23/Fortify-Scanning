@@ -1,41 +1,60 @@
 stages:
-  - scan
+  - build
+  - push
+  - fortify-scan
 
 variables:
   FMK_NEXUS: "fmk.nexus.onefiserv.net"
-  IMAGE_NAME: "$FMK_NEXUS/vendor/docker/fortifydocker/fortify-ci-tools:6.2.0-jdk-11"
-  BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-  PACKAGE_NAME: "scan-package.zip"
-  SSC_URL: "https://fortify.fiserv.one/ssc"
-  SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
-  FORTIFY_VERSION: "1.1"
-  FORTIFY_APPLICATION: "APM0004849"
-  FORTIFY_EMAIL: "APIHub@fiserv.com"
+  IMAGE_NAME: "$FMK_NEXUS/apihub-deploy-executor"
+  BUILD_TAG: "$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA"
+  DOTNET_BUILD_IMAGE: "$FMK_NEXUS/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
 
-fortify-scan:
-  stage: scan
-  image: "$IMAGE_NAME"
-  tags:
-    - apimhub
+# --- Step 1: Build .NET Application using Fortify-compatible image ---
+dotnet-build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "Preparing Fortify scan package..."
-    - mkdir -p artifacts
-    - scancentral package -o "$PACKAGE_NAME" -bt none -exclude "**/dist/*.js"
-    - echo "Running Fortify scan and uploading package to SSC..."
-    - echo "scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -scan
-      -application "$FORTIFY_APPLICATION"
-      -version "$FORTIFY_VERSION"
-      -uptoken "$SSC_TOKEN"
-      -uploadzip "$PACKAGE_NAME"
-      -b "$BUILD_ID"
-      -bt none
-      -email "$FORTIFY_EMAIL""
-    - >
-      scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -scan
-      -application "$FORTIFY_APPLICATION"
-      -version "$FORTIFY_VERSION"
-      -uptoken "$SSC_TOKEN"
-      -uploadzip "$PACKAGE_NAME"
-      -b "$BUILD_ID"
-      -bt none
-      -email "$FORTIFY_EMAIL"
+    - docker run -i --rm -v $CI_PROJECT_DIR:/app $DOTNET_BUILD_IMAGE \
+        Start-FortifyScan.ps1 \
+        -BuildId "$BUILD_TAG" \
+        -Source /app \
+        -Application "$FORTIFY_APP_NAME" \
+        -Version "$FORTIFY_VERSION" \
+        -Token "$SSC_TOKEN" \
+        -Email "$FORTIFY_NOTIFICATION_DL" \
+        -OutputFolder /app/artifacts \
+        -Publish
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 1 week
+
+# --- Step 2: Build and Push Docker Image to Nexus ---
+docker-push:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$NEXUS_REPO_USER" -p "$NEXUS_REPO_PASS" $FMK_NEXUS
+    - docker build -t $IMAGE_NAME:$BUILD_TAG .
+    - docker push $IMAGE_NAME:$BUILD_TAG
+
+# --- Step 3: Fortify Scan (can be reused standalone as well) ---
+fortify-scan:
+  stage: fortify-scan
+  image: $DOTNET_BUILD_IMAGE
+  script:
+    - mkdir -p /app/artifacts
+    - sourceanalyzer -b "$BUILD_TAG" /app
+    - Start-FortifyScan.ps1 \
+        -BuildId "$BUILD_TAG" \
+        -Source /app \
+        -Application "$FORTIFY_APP_NAME" \
+        -Version "$FORTIFY_VERSION" \
+        -Token "$SSC_TOKEN" \
+        -Email "$FORTIFY_NOTIFICATION_DL" \
+        -OutputFolder /app/artifacts \
+        -Publish
