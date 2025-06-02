@@ -29,14 +29,8 @@ fortify-scan:
     - scancentral package -o "$PACKAGE_NAME" -bt none -exclude "**/dist/*.js"
     - echo "Running Fortify scan and uploading package to SSC..."
     - echo "scancentral -sscurl \"$SSC_URL\" -ssctoken \"<TOKEN HIDDEN>\" start -scan -application \"$FORTIFY_APPLICATION\" -version \"$FORTIFY_VERSION\" -uptoken \"<TOKEN HIDDEN>\" -uploadzip \"$PACKAGE_NAME\" -b \"$BUILD_ID\" -bt none -email \"$FORTIFY_EMAIL\""
-    - |
-      scancentral -sscurl "$SSC_URL" \
-                  -ssctoken "$SSC_TOKEN" \
-                  start -scan \
-                  -application "$FORTIFY_APPLICATION" \
-                  -version "$FORTIFY_VERSION" \
-                  -uptoken "$SSC_TOKEN" \
-                  -uploadzip "$PACKAGE_NAME" \
-                  -b "$BUILD_ID" \
-                  -bt none \
-                  -email "$FORTIFY_EMAIL"
+    - >
+      scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -scan
+      -application "$FORTIFY_APPLICATION" -version "$FORTIFY_VERSION"
+      -uptoken "$SSC_TOKEN" -uploadzip "$PACKAGE_NAME"
+      -b "$BUILD_ID" -bt none -email "$FORTIFY_EMAIL"
