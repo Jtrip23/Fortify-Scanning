@@ -34,4 +34,4 @@ fortify-scan:
   artifacts:
     paths:
       - artifacts/
-    expire_in: 1 week
+    expire_in: 1 week 
