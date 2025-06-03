@@ -1,46 +1,37 @@
 stages:
-  - build
-  - fortify_scan
+  - scan
 
 variables:
   IMAGE_NAME: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
   BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-  SOURCE_DIR: "${CI_PROJECT_DIR}"  # Adjust if needed
-  OUTPUT_DIR: "${CI_PROJECT_DIR}/artifacts"
-  SSC_APPLICATION: "APM0004849"
-  FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
-  FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
-
-build:
-  stage: build
-  image: $IMAGE_NAME
-  script:
-    - echo "Restoring and building .NET app..."
-    - cd backend  # 👈 Update this path to where your .csproj is
-    - dotnet restore
-    - dotnet build --no-restore
-    - mkdir -p ../artifacts
-  artifacts:
-    paths:
-      - artifacts/
+  SOURCE_DIR: "/app"
+  OUTPUT_FOLDER: "/app/artifacts"
+  FORTIFY_APP: "APMXXXXX"
+  FORTIFY_VERSION: "1.0"
 
 fortify-scan:
-  stage: fortify_scan
-  image: $IMAGE_NAME
+  stage: scan
+  tags:
+    - docker
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "Running Fortify scan inside CI job container..."
     - mkdir -p artifacts
-    - powershell -Command "& 'Start-FortifyScan.ps1' `
-        -BuildId '${BUILD_ID}' `
-        -Source '${SOURCE_DIR}' `
-        -Application '${SSC_APPLICATION}' `
-        -Version '${SSC_VERSION}' `
-        -Token '${FORTIFY_TOKEN}' `
-        -Email '${FORTIFY_NOTIFICATION_DL}' `
-        -OutputFolder '${OUTPUT_DIR}' `
-        -Publish"
-  dependencies:
-    - build
+    - >
+      docker run -i --rm 
+      -v "$CI_PROJECT_DIR:/app" 
+      "$IMAGE_NAME" 
+      Start-FortifyScan.ps1 
+      -BuildId "$BUILD_ID" 
+      -Source "$SOURCE_DIR" 
+      -Application "$FORTIFY_APP" 
+      -Version "$FORTIFY_VERSION" 
+      -Token "$SSC_TOKEN" 
+      -Email "$FORTIFY_NOTIFICATION_DL" 
+      -OutputFolder "$OUTPUT_FOLDER" 
+      -Publish
   artifacts:
     paths:
       - artifacts/
+    expire_in: 1 week
