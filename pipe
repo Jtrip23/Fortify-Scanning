@@ -22,11 +22,11 @@ fortify_scan:
     - docker run -i --rm -v "$CI_PROJECT_DIR":/app \
         fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z \
         Start-FortifyScan.ps1 \
-          -BuildId "$CI_COMMIT_SHORT_SHA" \
+          -BuildId "12345678" \
           -Source /app \
-          -Application "APMXXXXX" \
-          -Version "$CI_COMMIT_REF_NAME" \
-          -Token "$FORTIFY_TOKEN" \
-          -Email "$FORTIFY_EMAIL" \
+          -Application "APM0004849" \
+          -Version "1.1" \
+          -Token "b190d1f5-d4b3-4708-8d36-19b7d8e6badc" \
+          -Email "APIHub@fiserv.com" \
           -OutputFolder /app/artifacts \
           -Publish
