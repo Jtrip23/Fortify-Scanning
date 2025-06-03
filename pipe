@@ -2,16 +2,19 @@ stages:
   - scan
 
 variables:
-  BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-  SOURCE_DIR: "/app"
+  BUILD_ID: "123456789"
+  SOURCE_DIR: "/1.1"
   OUTPUT_FOLDER: "/app/artifacts"
   FORTIFY_APP: "APM0004849"
   FORTIFY_VERSION: "1.1"
+  SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
+
 
 fortify-scan:
   stage: scan
   tags:
-    - docker  # or your specific GitLab Kubernetes runner tag
+    - apimhub
   image: fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z
   script:
     - mkdir -p artifacts
