@@ -2,9 +2,9 @@ stages:
   - fortify
 
 variables:
-  APM_ID: APM0004849
-  SCAN_VERSION: image-pull-secret-replicator
-  BUILD_IMAGE: fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build
+  APM_ID: "APM0004849"
+  SCAN_VERSION: "image-pull-secret-replicator"
+  BUILD_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build"
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
   DOTNET_NUGET_SIGNATURE_VERIFICATION: "false"
   FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
@@ -16,18 +16,18 @@ fortify-scan:
   script:
     - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
     - mkdir -p artifacts/fortify
-    - pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 `
-        -BuildId "12345678" `
-        -Source . `
-        -Application "$APM_ID" `
-        -Version "$SCAN_VERSION" `
-        -Token "$FORTIFY_TOKEN" `
-        -Email "$FORTIFY_EMAIL" `
-        -OutputFolder artifacts/fortify `
+    - pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 \
+        -BuildId "12345678" \
+        -Source "." \
+        -Application "$APM_ID" \
+        -Version "$SCAN_VERSION" \
+        -Token "$FORTIFY_TOKEN" \
+        -Email "$FORTIFY_EMAIL" \
+        -OutputFolder "artifacts/fortify" \
         -Publish
-    - pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 `
-        -FortifyReportsDirectory ./artifacts/fortify `
-        -FortifyJson ./.fortify.json
+    - pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 \
+        -FortifyReportsDirectory "./artifacts/fortify" \
+        -FortifyJson "./.fortify.json"
   artifacts:
     when: always
     paths:
