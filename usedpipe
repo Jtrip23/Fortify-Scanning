@@ -1,57 +1,55 @@
 stages:
-  - build
-  - fortify_scan
+  - scan
 
 variables:
-  IMAGE_NAME: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
-  BUILD_ID: "123456789"
-  SOURCE_DIR: "/1.1"
-  OUTPUT_DIR: "/app/artifacts"
-  SSC_APPLICATION: "APM0004849"
-  FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
-  FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
-
-
-
-build:
-  stage: build
-  image: $IMAGE_NAME
-  script:
-    - echo "Restoring and building .NET app..."
-    - dotnet restore
-    - dotnet build --no-restore
-    - mkdir -p artifacts
-  artifacts:
-    paths:
-      - artifacts/
+  BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
+  FORTIFY_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
+  FORTIFY_SOURCE_DIR: "/app"
+  FORTIFY_OUTPUT_DIR: "/app/artifacts"
+  SSC_APP: "APMXXXXX"
+  SSC_VERSION: "1.0"
+  SSC_UPLOAD_TOKEN: "$SSC_TOKEN"
+  SSC_URL: "$SSC_URL"
+  SSC_NOTIFICATION_DL: "$FORTIFY_NOTIFICATION_DL"
 
 fortify-scan:
-  stage: fortify_scan
-  image: $IMAGE_NAME
-  script:
-    - echo "Running Fortify scan inside CI job container..."
+  stage: scan
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
     - mkdir -p artifacts
-    - echo "powershell -Command "& 'Start-FortifyScan.ps1' `
-        -BuildId '${BUILD_ID}' `
-        -Source '${SOURCE_DIR}' `
-        -Application '${SSC_APPLICATION}' `
-        -Version '${SSC_VERSION}' `
-        -Token '${FORTIFY_TOKEN}' `
-        -Email '${FORTIFY_NOTIFICATION_DL}' `
-        -OutputFolder '${OUTPUT_DIR}' `
-        -Publish""
-      
-    - powershell -Command "& 'Start-FortifyScan.ps1' `
-        -BuildId '${BUILD_ID}' `
-        -Source '${SOURCE_DIR}' `
-        -Application '${SSC_APPLICATION}' `
-        -Version '${SSC_VERSION}' `
-        -Token '${FORTIFY_TOKEN}' `
-        -Email '${FORTIFY_NOTIFICATION_DL}' `
-        -OutputFolder '${OUTPUT_DIR}' `
-        -Publish"
-  dependencies:
-    - build
-  artifacts:
-    paths:
-      - artifacts/
+  script:
+    - echo "Starting Fortify scan for .NET code"
+    - docker run -i --rm -v "$CI_PROJECT_DIR:$FORTIFY_SOURCE_DIR" \
+        "$FORTIFY_IMAGE" \
+        Start-FortifyScan.ps1 \
+        -BuildId "$BUILD_ID" \
+        -Source "$FORTIFY_SOURCE_DIR" \
+        -Application "$SSC_APP" \
+        -Version "$SSC_VERSION" \
+        -Token "$SSC_UPLOAD_TOKEN" \
+        -Email "$SSC_NOTIFICATION_DL" \
+        -OutputFolder "$FORTIFY_OUTPUT_DIR" \
+        -Publish
+
+    # Optional: Direct SSC upload (if scan didn't publish)
+    - FPR_FILE=$(find artifacts -name "*.fpr" | head -n 1)
+    - |
+      if [ -f "$FPR_FILE" ]; then
+        echo "Uploading $FPR_FILE to SSC..."
+        docker run -i --rm -v "$CI_PROJECT_DIR:/app" "$FORTIFY_IMAGE" \
+          /etc/fortify/bin/fortifyclient uploadFPR \
+          -url "$SSC_URL" \
+          -authtoken "$SSC_UPLOAD_TOKEN" \
+          -application "$SSC_APP" \
+          -version "$SSC_VERSION" \
+          -file "$FPR_FILE"
+      else
+        echo "No .fpr file found to upload."
+      fi
+  only:
+    changes:
+      - "**/*.cs"     # Trigger only if C# source files change
+  tags:
+    - docker
