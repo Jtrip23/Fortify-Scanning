@@ -2,42 +2,31 @@ stages:
   - build
   - scan
 
-variables:
-  IMAGE_TAG: "FMK-20250401T173337Z"
-  BASE_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:${IMAGE_TAG}"
-  BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-  ARTIFACTS_DIR: "/app/artifacts"
-
-default:
-  image: $BASE_IMAGE
-  before_script:
-    - mkdir -p artifacts
-
-build-dotnet:
+build_dotnet:
   stage: build
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "Building .NET project..."
-    - dotnet msbuild ./default.proj
-  artifacts:
-    paths:
-      - artifacts/
-    expire_in: 1 week
+    - docker run -i --rm -v "$CI_PROJECT_DIR":/app \
+        fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z \
+        dotnet build
 
-fortify-scan:
+fortify_scan:
   stage: scan
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "Running Fortify scan and publishing..."
-    - |
-      Start-FortifyScan.ps1 `
-        -BuildId "$BUILD_ID" `
-        -Source /app `
-        -Application "$FORTIFY_APPLICATION" `
-        -Version "$FORTIFY_VERSION" `
-        -Token "$SSC_TOKEN" `
-        -Email "$FORTIFY_NOTIFICATION_DL" `
-        -OutputFolder /app/artifacts `
-        -Publish
-  artifacts:
-    paths:
-      - artifacts/
-    expire_in: 2 weeks
+    - mkdir -p artifacts
+    - docker run -i --rm -v "$CI_PROJECT_DIR":/app \
+        fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z \
+        Start-FortifyScan.ps1 \
+          -BuildId "$CI_COMMIT_SHORT_SHA" \
+          -Source /app \
+          -Application "APMXXXXX" \
+          -Version "$CI_COMMIT_REF_NAME" \
+          -Token "$FORTIFY_TOKEN" \
+          -Email "$FORTIFY_EMAIL" \
+          -OutputFolder /app/artifacts \
+          -Publish
