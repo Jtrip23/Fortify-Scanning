@@ -1,50 +1,35 @@
 stages:
-  - build
-  - scan
+  - fortify
 
 variables:
-  BUILD_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
-  DOTNET_PROJECT: "your-solution.sln"
-  BUILD_OUTPUT: "build_output"
-  FORTIFY_ARTIFACTS: "artifacts"
-  BUILD_ID: "APM001_BUILD"
-  APP_NAME: "APM001"
-  APP_VERSION: "1.0"
-  SCAN_EMAIL: "your.email@fiserv.com"
-  FORTIFY_TOKEN: "your-token-goes-here"
-
-build-dotnet:
-  stage: build
-  image: $BUILD_IMAGE
-  script:
-    - mkdir -p $BUILD_OUTPUT
-    - dotnet restore $DOTNET_PROJECT
-    - dotnet build $DOTNET_PROJECT -o $BUILD_OUTPUT --no-restore
-    - echo "Build completed. Output stored in $BUILD_OUTPUT."
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - $BUILD_OUTPUT/
-    expire_in: 1 day
+  APM_ID: "APM0004849"
+  SCAN_VERSION: "image-pull-secret-replicator"
+  BUILD_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  DOTNET_NUGET_SIGNATURE_VERIFICATION: "false"
+  FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_EMAIL: "APIHub@fiserv.com"
 
 fortify-scan:
-  stage: scan
-  image: $BUILD_IMAGE
+  stage: fortify
+  image: "$BUILD_IMAGE:FMK-20250401T173337Z"
   script:
-    - mkdir -p $FORTIFY_ARTIFACTS
-    - pwsh /etc/fortify/bin/Start-FortifyScan.ps1 `
-        -BuildId "$BUILD_ID" `
-        -Source /builds/$CI_PROJECT_PATH `
-        -Application "$APP_NAME" `
-        -Version "$APP_VERSION" `
-        -Token "$FORTIFY_TOKEN" `
-        -Email "$SCAN_EMAIL" `
-        -OutputFolder "/builds/$CI_PROJECT_PATH/$FORTIFY_ARTIFACTS" `
-        -Publish -Verbose
-  dependencies:
-    - build-dotnet
+    - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
+    - mkdir -p artifacts/fortify
+    - pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 \
+        -BuildId "12345678" \
+        -Source "." \
+        -Application "$APM_ID" \
+        -Version "$SCAN_VERSION" \
+        -Token "$FORTIFY_TOKEN" \
+        -Email "$FORTIFY_EMAIL" \
+        -OutputFolder "artifacts/fortify" \
+        -Publish
+    - pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 \
+        -FortifyReportsDirectory "./artifacts/fortify" \
+        -FortifyJson "./.fortify.json"
   artifacts:
-    name: "fortify-results-$CI_COMMIT_REF_NAME"
+    when: always
     paths:
-      - $FORTIFY_ARTIFACTS/
-    expire_in: 3 days
+      - artifacts/fortify/
+      - .fortify.json
