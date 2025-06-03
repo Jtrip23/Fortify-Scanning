@@ -1,55 +1,33 @@
 stages:
-  - scan
+  - fortify
 
 variables:
-  BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-  FORTIFY_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
-  FORTIFY_SOURCE_DIR: "/app"
-  FORTIFY_OUTPUT_DIR: "/app/artifacts"
-  SSC_APP: "APMXXXXX"
-  SSC_VERSION: "1.0"
-  SSC_UPLOAD_TOKEN: "$SSC_TOKEN"
-  SSC_URL: "$SSC_URL"
-  SSC_NOTIFICATION_DL: "$FORTIFY_NOTIFICATION_DL"
+  APM_ID: APM0008206
+  SCAN_VERSION: image-pull-secret-replicator
+  BUILD_IMAGE: fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  DOTNET_NUGET_SIGNATURE_VERIFICATION: "false"
 
 fortify-scan:
-  stage: scan
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - mkdir -p artifacts
+  stage: fortify
+  image: "$BUILD_IMAGE:FMK-20250401T173337Z"
   script:
-    - echo "Starting Fortify scan for .NET code"
-    - docker run -i --rm -v "$CI_PROJECT_DIR:$FORTIFY_SOURCE_DIR" \
-        "$FORTIFY_IMAGE" \
-        Start-FortifyScan.ps1 \
-        -BuildId "$BUILD_ID" \
-        -Source "$FORTIFY_SOURCE_DIR" \
-        -Application "$SSC_APP" \
-        -Version "$SSC_VERSION" \
-        -Token "$SSC_UPLOAD_TOKEN" \
-        -Email "$SSC_NOTIFICATION_DL" \
-        -OutputFolder "$FORTIFY_OUTPUT_DIR" \
+    - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
+    - mkdir -p artifacts/fortify
+    - pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 `
+        -BuildId "$CI_PIPELINE_ID" `
+        -Source . `
+        -Application "$APM_ID" `
+        -Version "$SCAN_VERSION" `
+        -Token "$FORTIFY_TOKEN" `
+        -Email "$FORTIFY_EMAIL" `
+        -OutputFolder artifacts/fortify `
         -Publish
-
-    # Optional: Direct SSC upload (if scan didn't publish)
-    - FPR_FILE=$(find artifacts -name "*.fpr" | head -n 1)
-    - |
-      if [ -f "$FPR_FILE" ]; then
-        echo "Uploading $FPR_FILE to SSC..."
-        docker run -i --rm -v "$CI_PROJECT_DIR:/app" "$FORTIFY_IMAGE" \
-          /etc/fortify/bin/fortifyclient uploadFPR \
-          -url "$SSC_URL" \
-          -authtoken "$SSC_UPLOAD_TOKEN" \
-          -application "$SSC_APP" \
-          -version "$SSC_VERSION" \
-          -file "$FPR_FILE"
-      else
-        echo "No .fpr file found to upload."
-      fi
-  only:
-    changes:
-      - "**/*.cs"     # Trigger only if C# source files change
-  tags:
-    - docker
+    - pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 `
+        -FortifyReportsDirectory ./artifacts/fortify `
+        -FortifyJson ./.fortify.json
+  artifacts:
+    when: always
+    paths:
+      - artifacts/fortify/
+      - .fortify.json
