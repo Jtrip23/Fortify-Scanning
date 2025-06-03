@@ -1,62 +1,54 @@
-Base .NET image with build tooling for .NET/ASP.NET applications. This image is derived from a combination of the Iron Bank version, the standard .NET image, and the base .NET dev container. The .NET images mirror the functionality of the standard Microsoft images but using the Fiserv base OS image.
+# .NET Build 8.0
+
+Base .NET image with build tooling for .NET/ASP.NET applications. This image is derived from a combination of [the Iron Bank version](https://repo1.dso.mil/dsop/redhat/dotnet-core/dotnet-sdk-8.0-ubi9-slim), [the standard .NET image](https://github.com/dotnet/dotnet-docker/), and the base [.NET dev container](https://github.com/devcontainers/images/tree/main/src/dotnet). The .NET images mirror the functionality of the standard Microsoft images but using the Fiserv base OS image.
+
 This is the image to use if you need more than just the SDK during build.
 
-
-.NET Build 8.0
-
-
-Usage
-
-dotnet build
-dotnet outdated and Other Global Tools
-Fortify Scanning
-Interactive Session
-VS Code Development Container
-Other AppSec Tooling
-
-
-Development
-
-
+- [.NET Build 8.0](#net-build-80)
+  - [Usage](#usage)
+    - [`dotnet build`](#dotnet-build)
+    - [`dotnet outdated` and Other Global Tools](#dotnet-outdated-and-other-global-tools)
+    - [Fortify Scanning](#fortify-scanning)
+    - [Interactive Session](#interactive-session)
+    - [VS Code Development Container](#vs-code-development-container)
+    - [Other AppSec Tooling](#other-appsec-tooling)
+  - [Development](#development)
 
 Related images:
 
-dotnet-8.0-runtime
-dotnet-8.0-aspnet
-dotnet-8.0-sdk
+- [dotnet-8.0-runtime](https://gitlab.onefiserv.net/fmk/fmk-build/build-internal/fmk-build-containers/lineage-dotnet/tier-1/dotnet-8.0-runtime)
+- [dotnet-8.0-aspnet](https://gitlab.onefiserv.net/fmk/fmk-build/build-internal/fmk-build-containers/lineage-dotnet/tier-2/dotnet-8.0-aspnet)
+- [dotnet-8.0-sdk](https://gitlab.onefiserv.net/fmk/fmk-build/build-internal/fmk-build-containers/lineage-dotnet/tier-3/dotnet-8.0-sdk)
 
+## Usage
 
-Usage
-The build image is based on the SDK image but comes with additional build-related tooling and debugging support that might not otherwise be in the SDK. This allows you to use any of the dotnet tooling or tools that rely on dotnet being installed.
-This should not be the base image for something you deploy. This is a build image with tools to get your application compiled and debugged. Your deployment should likely be based on the dotnet-8.0-runtime or dotnet-8.0-aspnet images.
+The build image is based on the SDK image but comes with additional build-related tooling and debugging support that might not otherwise be in the SDK. This allows you to use any of the `dotnet` tooling or tools that rely on `dotnet` being installed.
 
-⚠ Examples show a pinned image version. FMK images don't have a latest tag - tags are by date. It's up to you to use the latest image for your purposes. The FMK CLI has an fmk newest command, or you can look at this script for an example of how it happens during this image build.
+**This should not be the base image for something you deploy.** This is a build image with tools to get your application compiled and debugged. Your deployment should likely be based on the [dotnet-8.0-runtime](https://gitlab.onefiserv.net/fmk/fmk-build/build-internal/fmk-build-containers/lineage-dotnet/tier-1/dotnet-8.0-runtime) or [dotnet-8.0-aspnet](https://gitlab.onefiserv.net/fmk/fmk-build/build-internal/fmk-build-containers/lineage-dotnet/tier-2/dotnet-8.0-aspnet) images.
+
+> :warning: **Examples show a pinned image version.** FMK images don't have a `latest` tag - tags are by date. It's up to you to use the latest image for your purposes. [The FMK CLI](https://gitlab.onefiserv.net/fmk/fmk-cli) has an `fmk newest` command, or you can [look at this script](./pre_script.sh) for an example of how it happens during this image build.
 
 Installed tools include:
 
-AWS CLI
-Azure CLI
-Fortify SCA
-Python 3
-SonarScanner (as dotnet sonarscanner)
-Standard Linux networking tools
-dotnet global dev tools:
+- AWS CLI
+- Azure CLI
+- Fortify SCA
+- Python 3
+- SonarScanner (as `dotnet sonarscanner`)
+- Standard Linux networking tools
+- dotnet global dev tools:
+  - `dotnet counters`
+  - `dotnet coverage`
+  - `dotnet depends`
+  - `dotnet dump`
+  - `dotnet gcdump`
+  - `dotnet outdated`
+  - `dotnet symbol`
+  - `dotnet trace`
 
-dotnet counters
-dotnet coverage
-dotnet depends
-dotnet dump
-dotnet gcdump
-dotnet outdated
-dotnet symbol
-dotnet trace
+### `dotnet build`
 
-
-
-
-dotnet build
-
-
+```powershell
 # Go to your code.
 cd ~/dev/my-app
 
@@ -64,15 +56,15 @@ cd ~/dev/my-app
 docker run -i --rm -v ${PWD}:/app `
   fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z `
   dotnet msbuild ./default.proj
+```
 
+### `dotnet outdated` and Other Global Tools
 
+The image comes with several common `dotnet` global tools that can help during development. One example is the `dotnet outdated` tool that can tell you what packages are outdated in your solution.
 
-dotnet outdated and Other Global Tools
-The image comes with several common dotnet global tools that can help during development. One example is the dotnet outdated tool that can tell you what packages are outdated in your solution.
+> :white_check_mark: You can use this same pattern for _any_ arbitrary command in this image - not just the `dotnet` commands. This is just an example!
 
-✅ You can use this same pattern for any arbitrary command in this image - not just the dotnet commands. This is just an example!
-
-
+```powershell
 # Go to your code.
 cd ~/dev/my-app
 
@@ -80,13 +72,15 @@ cd ~/dev/my-app
 docker run -i --rm -v ${PWD}:/app `
   fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z `
   dotnet outdated
+```
 
+### Fortify Scanning
 
-
-Fortify Scanning
 The image includes the Fortify source code analyzer because the analyzer needs to have the version of .NET available that your source code uses.
-The scan utilities are in /etc/fortify/bin if you want to call them directly, or you can use the convenient scan-and-report script:
 
+The scan utilities are in `/etc/fortify/bin` if you want to call them directly, or you can use the convenient scan-and-report script:
+
+```powershell
 # Go to your code.
 cd ~/dev/my-app
 
@@ -112,27 +106,30 @@ docker run -i --rm -v ${PWD}:/app `
 docker run -i --rm -v ${PWD}:/app `
     fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z `
     sourceanalyzer -b APMXXXXX /app
+```
 
+If you use the script, you can control exclusions by adding a `.fortify.json` file in your source directory. That file looks like this:
 
-If you use the script, you can control exclusions by adding a .fortify.json file in your source directory. That file looks like this:
-
+```json
 {
   "exclude_patterns": [
     "test"
   ]
 }
+```
 
+Each of the `exclude_patterns` will get excluded from the scan.
 
-Each of the exclude_patterns will get excluded from the scan.
 The output folder will contain:
 
-The logs from the scan, so you can troubleshoot any issues.
-The scan results in .txt and .fpr formats.
+- The logs from the scan, so you can troubleshoot any issues.
+- The scan results in .txt and .fpr formats.
 
+### Interactive Session
 
-Interactive Session
-The image has sh, bash, and PowerShell in place so you can optionally interactively develop using a session in a container. This allows you to use tools like the Azure or AWS command line tools to login and execute commands against cloud endpoints.
+The image has `sh`, `bash`, and PowerShell in place so you can optionally interactively develop using a session in a container. This allows you to use tools like the Azure or AWS command line tools to login and execute commands against cloud endpoints.
 
+```powershell
 # Go to your code.
 cd ~/dev/my-app
 
@@ -141,28 +138,30 @@ docker run -it --rm -v ${PWD}:/app fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0
 
 # Start the container with PowerShell as your shell.
 docker run -it --rm -v ${PWD}:/app fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z pwsh
+```
 
+### VS Code Development Container
 
+[The `devcontainer-example` folder](./devcontainer-example/) has a simple example project that shows how you can set up a [VS Code dev container](https://code.visualstudio.com/docs/devcontainers/containers) using this build image.
 
-VS Code Development Container
-The devcontainer-example folder has a simple example project that shows how you can set up a VS Code dev container using this build image.
-The important part is the devcontainer/devcontainer.json file:
+The important part is the [`devcontainer/devcontainer.json` file](./devcontainer-example/.devcontainer/devcontainer.json):
 
+- `image` must be set to the `dotnet-8.0-build` container. (It is currently set to the local build for testing purposes.)
+- `remoteUser` must be set to `dotnet` since that's the user set up for development.
 
-image must be set to the dotnet-8.0-build container. (It is currently set to the local build for testing purposes.)
+You need Docker to start a dev container as well as the VS Code [Remote Development extension pack](ms-vscode-remote.vscode-remote-extensionpack).
 
-remoteUser must be set to dotnet since that's the user set up for development.
+There [is documentation about what can go in `devcontainer.json`](https://aka.ms/devcontainer.json) as well as more info on the [standard `dotnet` dev container](https://github.com/devcontainers/templates/tree/main/src/dotnet).
 
-You need Docker to start a dev container as well as the VS Code Remote Development extension pack.
-There is documentation about what can go in devcontainer.json as well as more info on the standard dotnet dev container.
+### Other AppSec Tooling
 
-Other AppSec Tooling
-
-⚠ Only Fortify Static Code Analysis is in this image - other AppSec tooling is not. There is a dedicated image for that with tools you can use for scanning and builds.
+> :warning: **Only Fortify Static Code Analysis is in this image - other AppSec tooling is not.** There is a dedicated image for that with tools you can use for scanning and builds.
 
 Fortify is included in the image because the scanner requires .NET be installed to be able to do the scan. Sonatype Lifecycle and other tools don't require that, so you can use the dedicated AppSec image for the rest.
+
 Despite the other AppSec tooling not being here, it's helpful to know how to run it against your code as you work.
 
+```powershell
 # Select the AppSec image you want to use for scanning.
 # Again, Sonatype Lifecycle and Build Breaker are NOT in the
 # dotnet build image! They're in the AppSec image!
@@ -187,20 +186,20 @@ docker run -i --rm -v .:/code $image `
 ### BUILD BREAKER
 docker run -i --rm $image `
   /app/build-breaker/build-breaker.sh $apm $version $email $email
+```
 
+## Development
 
+> :warning: This section is "if you're working on improving this image" not "if you're using this image to develop a product."
 
-Development
+We use [pre-commit](https://pre-commit.com) to do linting and verification.
 
-⚠ This section is "if you're working on improving this image" not "if you're using this image to develop a product."
-
-We use pre-commit to do linting and verification.
-
+```powershell
 # On first clone, install pre-commit.
 pre-commit install
 
 # Build the image.
 docker build --tag 'dotnet-8.0-build:local' .
-
+```
 
 There are tasks set up for Visual Studio Code if you use that for development.
