@@ -1,52 +1,35 @@
-Running with gitlab-runner 16.11.2 (1d04b67a)
-  on l7lt2apmglr0005-Global-GitLab-Cloud-Docker-apihub-shared 9_2bTK_P, system ID: s_842e1c8182d6
+Running with gitlab-runner 16.3.3 (ed9cebb1)
+  on gitlab-runner-generic-16-3-3-86757766f-tshrs MdE7A4yc, system ID: r_3KAjEsDRRBea
 Resolving secrets
-Preparing the "docker" executor
-00:12
-Using Docker executor with image fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z ...
-Pulling docker image fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z ...
-Using docker image sha256:e6ed04d4e6aa347015fd0a2dabace94fdf6de7278e61a85bfdb74f42b017cfe3 for fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z with digest fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build@sha256:97a58e923ee45cf7ec524a0ea3b020543f984b7d46a2bbc953503d593655f71f ...
+00:00
+Preparing the "kubernetes" executor
+00:00
+Using Kubernetes namespace: gitlab-prod
+Using Kubernetes executor with image docker:latest ...
+Using attach strategy to execute scripts...
 Preparing environment
-00:04
-Running on runner-92btkp-project-26732-concurrent-0 via l7lt2apmglr0005...
-Getting source from Git repository
-00:05
-Fetching changes with git depth set to 20...
-Reinitialized existing Git repository in /builds/na/corp/technology-services/apigee-ofs/fiserv_apigee_management_portal/.git/
-Checking out e8cd17fe as detached HEAD (ref is feature)...
-Removing artifacts/
-Skipping Git submodules setup
-Executing "step_script" stage of the job script
-00:04
-Using docker image sha256:e6ed04d4e6aa347015fd0a2dabace94fdf6de7278e61a85bfdb74f42b017cfe3 for fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z with digest fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build@sha256:97a58e923ee45cf7ec524a0ea3b020543f984b7d46a2bbc953503d593655f71f ...
-$ mkdir -p artifacts
-$ echo "pwsh -File Start-FortifyScan.ps1 ` -BuildId "$BUILD_ID" ` -Source "$SOURCE_DIR" ` -Application "$FORTIFY_APP" ` -Version "$FORTIFY_VERSION" ` -Token "$SSC_TOKEN" ` -Email "$FORTIFY_NOTIFICATION_DL" ` -OutputFolder "$OUTPUT_FOLDER" ` -Publish"
-/usr/bin/bash: line 180: -BuildId: command not found
-/usr/bin/bash: line 180: -Application: command not found
-/usr/bin/bash: line 180: -Token: command not found
-/usr/bin/bash: line 180: -OutputFolder: command not found
-pwsh -File Start-FortifyScan.ps1  -Source /1.1  -Version 1.1  -Email APIHub@fiserv.com  -Publish
-$ pwsh -File Start-FortifyScan.ps1 ` -BuildId "$BUILD_ID" ` -Source "$SOURCE_DIR" ` -Application "$FORTIFY_APP" ` -Version "$FORTIFY_VERSION" ` -Token "$SSC_TOKEN" ` -Email "$FORTIFY_NOTIFICATION_DL" ` -OutputFolder "$OUTPUT_FOLDER" ` -Publish
-/usr/bin/bash: line 182: -BuildId: command not found
-/usr/bin/bash: line 182: -Application: command not found
-/usr/bin/bash: line 182: -Token: command not found
-/usr/bin/bash: line 182: -OutputFolder: command not found
-The argument 'Start-FortifyScan.ps1' is not recognized as the name of a script file. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
-Usage: pwsh[.exe] [-Login] [[-File] <filePath> [args]]
-                  [-Command { - | <script-block> [-args <arg-array>]
-                                | <string> [<CommandParameters>] } ]
-                  [-CommandWithArgs <string> [<CommandParameters>]
-                  [-ConfigurationName <string>] [-ConfigurationFile <filePath>]
-                  [-CustomPipeName <string>] [-EncodedCommand <Base64EncodedCommand>]
-                  [-ExecutionPolicy <ExecutionPolicy>] [-InputFormat {Text | XML}]
-                  [-Interactive] [-MTA] [-NoExit] [-NoLogo] [-NonInteractive] [-NoProfile]
-                  [-NoProfileLoadTime] [-OutputFormat {Text | XML}] 
-                  [-SettingsFile <filePath>] [-SSHServerMode] [-STA] 
-                  [-Version] [-WindowStyle <style>] 
-                  [-WorkingDirectory <directoryPath>]
-       pwsh[.exe] -h | -Help | -? | /?
-PowerShell Online Help https://aka.ms/powershell-docs
-All parameters are case-insensitive.
-Cleaning up project directory and file based variables
-00:01
-ERROR: Job failed: exit code 1
+00:24
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+	ContainersNotReady: "containers with unready status: [build helper svc-0]"
+WARNING: Failed to pull image with policy "": image pull failed: rpc error: code = Unknown desc = failed to pull and unpack image "docker.io/library/docker:latest": failed to resolve reference "docker.io/library/docker:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/docker/manifests/latest": net/http: TLS handshake timeout
+ERROR: Job failed: prepare environment: waiting for pod running: pulling image "docker:latest": image pull failed: rpc error: code = Unknown desc = failed to pull and unpack image "docker.io/library/docker:latest": failed to resolve reference "docker.io/library/docker:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/docker/manifests/latest": net/http: TLS handshake timeout. Check https://docs.gitlab.com/runner/shells/index.html#shell-profile-loading for more information
