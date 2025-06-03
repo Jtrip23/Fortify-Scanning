@@ -1,60 +1,57 @@
 stages:
   - build
-  - push
-  - fortify-scan
+  - fortify_scan
 
 variables:
-  FMK_NEXUS: "fmk.nexus.onefiserv.net"
-  IMAGE_NAME: "$FMK_NEXUS/apihub-deploy-executor"
-  BUILD_TAG: "$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA"
-  DOTNET_BUILD_IMAGE: "$FMK_NEXUS/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
+  IMAGE_NAME: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z"
+  BUILD_ID: "123456789"
+  SOURCE_DIR: "/1.1"
+  OUTPUT_DIR: "/app/artifacts"
+  SSC_APPLICATION: "APM0004849"
+  FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
 
-# --- Step 1: Build .NET Application using Fortify-compatible image ---
-dotnet-build:
+
+
+build:
   stage: build
-  image: docker:latest
-  services:
-    - docker:dind
+  image: $IMAGE_NAME
   script:
-    - docker run -i --rm -v $CI_PROJECT_DIR:/app $DOTNET_BUILD_IMAGE \
-        Start-FortifyScan.ps1 \
-        -BuildId "$BUILD_TAG" \
-        -Source /app \
-        -Application "$FORTIFY_APP_NAME" \
-        -Version "$FORTIFY_VERSION" \
-        -Token "$SSC_TOKEN" \
-        -Email "$FORTIFY_NOTIFICATION_DL" \
-        -OutputFolder /app/artifacts \
-        -Publish
+    - echo "Restoring and building .NET app..."
+    - dotnet restore
+    - dotnet build --no-restore
+    - mkdir -p artifacts
   artifacts:
     paths:
       - artifacts/
-    expire_in: 1 week
 
-# --- Step 2: Build and Push Docker Image to Nexus ---
-docker-push:
-  stage: push
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$NEXUS_REPO_USER" -p "$NEXUS_REPO_PASS" $FMK_NEXUS
-    - docker build -t $IMAGE_NAME:$BUILD_TAG .
-    - docker push $IMAGE_NAME:$BUILD_TAG
-
-# --- Step 3: Fortify Scan (can be reused standalone as well) ---
 fortify-scan:
-  stage: fortify-scan
-  image: $DOTNET_BUILD_IMAGE
+  stage: fortify_scan
+  image: $IMAGE_NAME
   script:
-    - mkdir -p /app/artifacts
-    - sourceanalyzer -b "$BUILD_TAG" /app
-    - Start-FortifyScan.ps1 \
-        -BuildId "$BUILD_TAG" \
-        -Source /app \
-        -Application "$FORTIFY_APP_NAME" \
-        -Version "$FORTIFY_VERSION" \
-        -Token "$SSC_TOKEN" \
-        -Email "$FORTIFY_NOTIFICATION_DL" \
-        -OutputFolder /app/artifacts \
-        -Publish
+    - echo "Running Fortify scan inside CI job container..."
+    - mkdir -p artifacts
+    - echo "powershell -Command "& 'Start-FortifyScan.ps1' `
+        -BuildId '${BUILD_ID}' `
+        -Source '${SOURCE_DIR}' `
+        -Application '${SSC_APPLICATION}' `
+        -Version '${SSC_VERSION}' `
+        -Token '${FORTIFY_TOKEN}' `
+        -Email '${FORTIFY_NOTIFICATION_DL}' `
+        -OutputFolder '${OUTPUT_DIR}' `
+        -Publish""
+      
+    - powershell -Command "& 'Start-FortifyScan.ps1' `
+        -BuildId '${BUILD_ID}' `
+        -Source '${SOURCE_DIR}' `
+        -Application '${SSC_APPLICATION}' `
+        -Version '${SSC_VERSION}' `
+        -Token '${FORTIFY_TOKEN}' `
+        -Email '${FORTIFY_NOTIFICATION_DL}' `
+        -OutputFolder '${OUTPUT_DIR}' `
+        -Publish"
+  dependencies:
+    - build
+  artifacts:
+    paths:
+      - artifacts/
