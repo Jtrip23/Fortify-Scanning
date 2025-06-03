@@ -1,35 +1,93 @@
 Running with gitlab-runner 16.3.3 (ed9cebb1)
-  on gitlab-runner-generic-16-3-3-86757766f-tshrs MdE7A4yc, system ID: r_3KAjEsDRRBea
+  on gitlab-runner-generic-16-3-3-86757766f-l2pzt 193Dsk6J, system ID: r_ByaXLIvJToWC
 Resolving secrets
 00:00
 Preparing the "kubernetes" executor
 00:00
 Using Kubernetes namespace: gitlab-prod
-Using Kubernetes executor with image docker:latest ...
+Using Kubernetes executor with image fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z ...
 Using attach strategy to execute scripts...
 Preparing environment
-00:24
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-mde7a4yc-project-26732-concurrent-0-4wpf0hbd to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-WARNING: Failed to pull image with policy "": image pull failed: rpc error: code = Unknown desc = failed to pull and unpack image "docker.io/library/docker:latest": failed to resolve reference "docker.io/library/docker:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/docker/manifests/latest": net/http: TLS handshake timeout
-ERROR: Job failed: prepare environment: waiting for pod running: pulling image "docker:latest": image pull failed: rpc error: code = Unknown desc = failed to pull and unpack image "docker.io/library/docker:latest": failed to resolve reference "docker.io/library/docker:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/docker/manifests/latest": net/http: TLS handshake timeout. Check https://docs.gitlab.com/runner/shells/index.html#shell-profile-loading for more information
+00:53
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotInitialized: "containers with incomplete status: [init-permissions]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotInitialized: "containers with incomplete status: [init-permissions]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotInitialized: "containers with incomplete status: [init-permissions]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotInitialized: "containers with incomplete status: [init-permissions]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotInitialized: "containers with incomplete status: [init-permissions]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Waiting for pod gitlab-prod/runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y to be running, status is Pending
+	ContainersNotReady: "containers with unready status: [build helper]"
+	ContainersNotReady: "containers with unready status: [build helper]"
+Running on runner-193dsk6j-project-26732-concurrent-0-wbwe0d2y via gitlab-runner-generic-16-3-3-86757766f-l2pzt...
+Getting source from Git repository
+00:09
+Fetching changes with git depth set to 20...
+Initialized empty Git repository in /builds/na/corp/technology-services/apigee-ofs/fiserv_apigee_management_portal/.git/
+Created fresh repository.
+Checking out 6bec99c6 as detached HEAD (ref is feature)...
+Skipping Git submodules setup
+Executing "step_script" stage of the job script
+00:06
+$ echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
+Running Fortify scan for APM0004849 - image-pull-secret-replicator
+$ mkdir -p artifacts/fortify
+$ pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 ` -BuildId "12345678" ` -Source . ` -Application "$APM_ID" ` -Version "$SCAN_VERSION" ` -Token "$FORTIFY_TOKEN" ` -Email "$FORTIFY_EMAIL" ` -OutputFolder artifacts/fortify ` -Publish
+/scripts-26732-14931907/step_script: line 179: -BuildId: command not found
+/scripts-26732-14931907/step_script: line 179: -Application: command not found
+/scripts-26732-14931907/step_script: line 179: -Token: command not found
+/scripts-26732-14931907/step_script: line 179: -OutputFolder: command not found
+cmdlet Start-FortifyScan.ps1 at command pipeline position 1
+Supply values for the following parameters:
+BuildId: 
+Start-FortifyScan.ps1: Cannot process command because of one or more missing mandatory parameters: BuildId Application Token OutputFolder.
+Uploading artifacts for failed job
+00:04
+Uploading artifacts...
+artifacts/fortify/: found 1 matching artifact files and directories 
+WARNING: .fortify.json: no matching files. Ensure that the artifact path is relative to the working directory (/builds/na/corp/technology-services/apigee-ofs/fiserv_apigee_management_portal) 
+Uploading artifacts as "archive" to coordinator... 201 Created  id=14931907 responseStatus=201 Created token=glcbt-64
+Cleaning up project directory and file based variables
+00:02
+ERROR: Job failed: command terminated with exit code 1
