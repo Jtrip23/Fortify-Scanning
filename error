@@ -1,35 +1,32 @@
-Running with gitlab-runner 16.3.3 (ed9cebb1)
-  on gitlab-runner-docker-16-3-3-55f9857467-zx7c6 Pc7qjC_J, system ID: r_SrP1To9bjFSV
+Running with gitlab-runner 16.11.2 (1d04b67a)
+  on l7lt2apmglr0004-Global-GitLab-Cloud-Docker-apihub-shared FeEX_mAX, system ID: s_842e1c8182d6
 Resolving secrets
-00:00
-Preparing the "kubernetes" executor
-00:00
-Using Kubernetes namespace: gitlab-prod
-Using Kubernetes executor with image docker:latest ...
-Using attach strategy to execute scripts...
+Preparing the "docker" executor
+00:07
+Using Docker executor with image fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z ...
+Pulling docker image fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z ...
+Using docker image sha256:e6ed04d4e6aa347015fd0a2dabace94fdf6de7278e61a85bfdb74f42b017cfe3 for fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z with digest fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build@sha256:97a58e923ee45cf7ec524a0ea3b020543f984b7d46a2bbc953503d593655f71f ...
 Preparing environment
-00:24
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-Waiting for pod gitlab-prod/runner-pc7qjcj-project-26732-concurrent-0-4uz8rnls to be running, status is Pending
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-	ContainersNotReady: "containers with unready status: [build helper svc-0]"
-WARNING: Failed to pull image with policy "": image pull failed: rpc error: code = Unknown desc = failed to pull and unpack image "docker.io/library/docker:latest": failed to resolve reference "docker.io/library/docker:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/docker/manifests/latest": net/http: TLS handshake timeout
-ERROR: Job failed: prepare environment: waiting for pod running: pulling image "docker:latest": image pull failed: rpc error: code = Unknown desc = failed to pull and unpack image "docker.io/library/docker:latest": failed to resolve reference "docker.io/library/docker:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/docker/manifests/latest": net/http: TLS handshake timeout. Check https://docs.gitlab.com/runner/shells/index.html#shell-profile-loading for more information
+00:01
+Running on runner-feexmax-project-26732-concurrent-0 via l7lt2apmglr0004...
+Getting source from Git repository
+00:09
+Fetching changes with git depth set to 20...
+Reinitialized existing Git repository in /builds/na/corp/technology-services/apigee-ofs/fiserv_apigee_management_portal/.git/
+Checking out 3f126268 as detached HEAD (ref is feature)...
+Removing artifacts/
+Removing scan-package.zip
+Skipping Git submodules setup
+Executing "step_script" stage of the job script
+00:05
+Using docker image sha256:e6ed04d4e6aa347015fd0a2dabace94fdf6de7278e61a85bfdb74f42b017cfe3 for fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z with digest fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build@sha256:97a58e923ee45cf7ec524a0ea3b020543f984b7d46a2bbc953503d593655f71f ...
+$ mkdir -p artifacts
+$ Start-FortifyScan.ps1 ` # collapsed multi-line command
+/usr/bin/bash: line 182: -BuildId: command not found
+cmdlet Start-FortifyScan.ps1 at command pipeline position 1
+Supply values for the following parameters:
+BuildId: 
+Start-FortifyScan.ps1: Cannot process command because of one or more missing mandatory parameters: BuildId Source Application Version Token Email OutputFolder.
+Cleaning up project directory and file based variables
+00:00
+ERROR: Job failed: exit code 1
