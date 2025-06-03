@@ -1,33 +1,43 @@
 stages:
+  - build
   - scan
 
 variables:
+  IMAGE_TAG: "FMK-20250401T173337Z"
+  BASE_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:${IMAGE_TAG}"
   BUILD_ID: "${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-  SOURCE_DIR: "/1.1"
-  OUTPUT_FOLDER: "/app/artifacts"
-  FORTIFY_APP: "APM0004849"
-  FORTIFY_VERSION: "1.1"
-  SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
-  FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
+  ARTIFACTS_DIR: "/app/artifacts"
 
-fortify-scan:
-  stage: scan
-  tags:
-    - apimhub
-  image: fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z
-  script:
+default:
+  image: $BASE_IMAGE
+  before_script:
     - mkdir -p artifacts
-    - >
-      pwsh -File scripts/Start-FortifyScan.ps1
-      -BuildId "$BUILD_ID"
-      -Source "$SOURCE_DIR"
-      -Application "$FORTIFY_APP"
-      -Version "$FORTIFY_VERSION"
-      -Token "$SSC_TOKEN"
-      -Email "$FORTIFY_NOTIFICATION_DL"
-      -OutputFolder "$OUTPUT_FOLDER"
-      -Publish
+
+build-dotnet:
+  stage: build
+  script:
+    - echo "Building .NET project..."
+    - dotnet msbuild ./default.proj
   artifacts:
     paths:
       - artifacts/
     expire_in: 1 week
+
+fortify-scan:
+  stage: scan
+  script:
+    - echo "Running Fortify scan and publishing..."
+    - |
+      Start-FortifyScan.ps1 `
+        -BuildId "$BUILD_ID" `
+        -Source /app `
+        -Application "$FORTIFY_APPLICATION" `
+        -Version "$FORTIFY_VERSION" `
+        -Token "$SSC_TOKEN" `
+        -Email "$FORTIFY_NOTIFICATION_DL" `
+        -OutputFolder /app/artifacts `
+        -Publish
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 2 weeks
