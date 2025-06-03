@@ -17,24 +17,16 @@ fortify-scan:
   image: fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build:FMK-20250401T173337Z
   script:
     - mkdir -p artifacts
-    - echo "pwsh -File Start-FortifyScan.ps1 `
-        -BuildId "$BUILD_ID" `
-        -Source "$SOURCE_DIR" `
-        -Application "$FORTIFY_APP" `
-        -Version "$FORTIFY_VERSION" `
-        -Token "$SSC_TOKEN" `
-        -Email "$FORTIFY_NOTIFICATION_DL" `
-        -OutputFolder "$OUTPUT_FOLDER" `
-        -Publish"
-    - pwsh -File Start-FortifyScan.ps1 `
-        -BuildId "$BUILD_ID" `
-        -Source "$SOURCE_DIR" `
-        -Application "$FORTIFY_APP" `
-        -Version "$FORTIFY_VERSION" `
-        -Token "$SSC_TOKEN" `
-        -Email "$FORTIFY_NOTIFICATION_DL" `
-        -OutputFolder "$OUTPUT_FOLDER" `
-        -Publish
+    - >
+      pwsh -File scripts/Start-FortifyScan.ps1
+      -BuildId "$BUILD_ID"
+      -Source "$SOURCE_DIR"
+      -Application "$FORTIFY_APP"
+      -Version "$FORTIFY_VERSION"
+      -Token "$SSC_TOKEN"
+      -Email "$FORTIFY_NOTIFICATION_DL"
+      -OutputFolder "$OUTPUT_FOLDER"
+      -Publish
   artifacts:
     paths:
       - artifacts/
