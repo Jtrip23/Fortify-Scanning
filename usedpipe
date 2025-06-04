@@ -3,15 +3,15 @@ stages:
 
 variables:
   APM_ID: "APM0004849"
-  SCAN_VERSION: "image-pull-secret-replicator"
+  SCAN_VERSION: "1.1"
   BUILD_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build"
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
   DOTNET_NUGET_SIGNATURE_VERIFICATION: "false"
   FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
   FORTIFY_EMAIL: "APIHub@fiserv.com"
   SSC_URL: "https://fortify.example.com/ssc"
-  SSC_TOKEN: "$SSC_TOKEN"
-  SSC_UPLOAD_TOKEN: "$SSC_UPLOAD_TOKEN"
+  SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  SSC_UPLOAD_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
   FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
   FORTIFY_VERSION: "$SCAN_VERSION"
 
@@ -56,5 +56,5 @@ fortify-scan:
       - .fortify.json
   tags:
     - apimhub
-  rules:
-    - if: '$FORTIFY_SCAN == "true" && $CI_COMMIT_BRANCH == "develop"'
+  #rules:
+  #  - if: '$FORTIFY_SCAN == "true" && $CI_COMMIT_BRANCH == "develop"'
