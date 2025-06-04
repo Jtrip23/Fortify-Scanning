@@ -1,14 +1,10 @@
-$ pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 ` # collapsed multi-line command
-/usr/bin/bash: line 189: -BuildId: command not found
-cmdlet Start-FortifyScan.ps1 at command pipeline position 1
-Supply values for the following parameters:
-BuildId: 
-Start-FortifyScan.ps1: Cannot process command because of one or more missing mandatory parameters: BuildId Source Application Version Token Email OutputFolder.
+$ pwsh -NoProfile -Command "& { /etc/fortify/bin/Start-FortifyScan.ps1 ` -BuildId '12345678' ` -Source '.' ` -Application '$env:APM_ID' ` -Version '$env:SCAN_VERSION' ` -Token '$env:FORTIFY_TOKEN' ` -Email '$env:FORTIFY_EMAIL' ` -OutputFolder 'artifacts/fortify' }"
+/usr/bin/bash: eval: line 190: unexpected EOF while looking for matching ``'
 Uploading artifacts for failed job
-00:12
+00:11
 Uploading artifacts...
 artifacts/fortify/: found 2 matching artifact files and directories 
-Uploading artifacts as "archive" to coordinator... 201 Created  id=14959922 responseStatus=201 Created token=glcbt-64
+Uploading artifacts as "archive" to coordinator... 201 Created  id=14960076 responseStatus=201 Created token=glcbt-64
 Cleaning up project directory and file based variables
 00:01
-ERROR: Job failed: exit code 1
+ERROR: Job failed: exit code 2
