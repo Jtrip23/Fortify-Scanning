@@ -1,28 +1,9 @@
-Problem 1:
-I think I misunderstood what was happening. I think Gitlab runs everything with sh. So maybe backslash in this case is right.
- 
-Problem 2:
-Your YAML is still invalid.
-YAML
-script:
-  - |
-      pwsh foo bar baz \
-        more lines here \
-        more lines here
-Note it's just - | NOT - | -
-
-$ pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 ` # collapsed multi-line command
-/scripts-26732-14958139/step_script: line 182: -BuildId: command not found
-cmdlet Start-FortifyScan.ps1 at command pipeline position 1
-Supply values for the following parameters:
-BuildId: 
-Start-FortifyScan.ps1: Cannot process command because of one or more missing mandatory parameters: BuildId Source Application Version Token Email OutputFolder.
-Uploading artifacts for failed job
-00:10
-Uploading artifacts...
-artifacts/fortify/: found 2 matching artifact files and directories 
-WARNING: .fortify.json: no matching files. Ensure that the artifact path is relative to the working directory (/builds/na/corp/technology-services/apigee-ofs/fiserv_apigee_management_portal) 
-Uploading artifacts as "archive" to coordinator... 201 Created  id=14958139 responseStatus=201 Created token=glcbt-64
-Cleaning up project directory and file based variables
-00:00
-ERROR: Job failed: command terminated with exit code 1
+scan-distribution:
+  stage: scan
+  image: $APIHUB_FORTIFY
+  script:
+    - scancentral -sscurl $SSC_URL -ssctoken $SSC_TOKEN start -upload -application APM0006528 -version $FORTIFY_VERSION -uptoken $SSC_TOKEN -email $FORTIFY_NOTIFICATION_DL -bt none -targs "-exclude **/dist/$BUNDLE.js"
+  tags:
+    - apimhub
+  rules:
+    - if: '( $FORTIFY_SCAN == "true" && $CI_COMMIT_BRANCH == "develop")'
