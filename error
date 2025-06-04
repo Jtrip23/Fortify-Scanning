@@ -1,10 +1,27 @@
-$ pwsh -NoProfile -Command "& { /etc/fortify/bin/Start-FortifyScan.ps1 ` -BuildId '12345678' ` -Source '.' ` -Application '$env:APM_ID' ` -Version '$env:SCAN_VERSION' ` -Token '$env:FORTIFY_TOKEN' ` -Email '$env:FORTIFY_EMAIL' ` -OutputFolder 'artifacts/fortify' }"
-/usr/bin/bash: eval: line 190: unexpected EOF while looking for matching ``'
+$ pwsh -NoProfile -Command "& '/etc/fortify/bin/Start-FortifyScan.ps1' -BuildId '12345678' -Source '.' -Application $env:APM_ID -Version $env:SCAN_VERSION -Token $env:FORTIFY_TOKEN -Email $env:FORTIFY_EMAIL -OutputFolder 'artifacts/fortify'"
+Cleaning the build for a fresh scan.
+Running source analysis.
+12345678
+   Created: Jun 4, 2025, 11:02:52 AM
+   Last Modified: Jun 4, 2025, 11:02:52 AM
+   Errors and Warnings: 1
+   Project: []  Label: []  Version: []
+Executing scan based on source analysis.
+Fortify scan complete.
+$ pwsh -NoProfile -Command "& 'scancentral' -sscurl $env:SSC_URL -ssctoken $env:SSC_TOKEN start -upload -application $env:APM_ID -version $env:SCAN_VERSION -uptoken $env:SSC_UPLOAD_TOKEN -email $env:FORTIFY_NOTIFICATION_DL -bt none"
+launcher.log will be stored in "/home/app/.fortify/scancentral-24.4.1/log" directory.
+Getting controller URL from SSC...
+Update failed.
+Error getting Controller URL from SSC.
+no protocol: :SSC_URL/api/v1/configuration/cloud.ctrl.url
+scancentral.log will be stored in "/home/app/.fortify/scancentral-24.4.1/log" directory.
+Malformed email address. Expected a single email in the format username@host.domain
+Shutting down with errors. Please see log for details.
 Uploading artifacts for failed job
-00:11
+00:14
 Uploading artifacts...
-artifacts/fortify/: found 2 matching artifact files and directories 
-Uploading artifacts as "archive" to coordinator... 201 Created  id=14960076 responseStatus=201 Created token=glcbt-64
+artifacts/fortify/: found 7 matching artifact files and directories 
+Uploading artifacts as "archive" to coordinator... 201 Created  id=14960136 responseStatus=201 Created token=glcbt-64
 Cleaning up project directory and file based variables
 00:01
-ERROR: Job failed: exit code 2
+ERROR: Job failed: exit code 1
