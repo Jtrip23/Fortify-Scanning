@@ -22,28 +22,9 @@ fortify-scan:
     - mkdir -p artifacts/fortify
     - zip -r artifacts/fortify/source.zip . -x "artifacts/*"
 
-    - pwsh -NoProfile -Command "& {
-        /etc/fortify/bin/Start-FortifyScan.ps1 `
-          -BuildId '12345678' `
-          -Source '.' `
-          -Application '$env:APM_ID' `
-          -Version '$env:SCAN_VERSION' `
-          -Token '$env:FORTIFY_TOKEN' `
-          -Email '$env:FORTIFY_EMAIL' `
-          -OutputFolder 'artifacts/fortify'
-      }"
+    - pwsh -NoProfile -Command "& '/etc/fortify/bin/Start-FortifyScan.ps1' -BuildId '12345678' -Source '.' -Application $env:APM_ID -Version $env:SCAN_VERSION -Token $env:FORTIFY_TOKEN -Email $env:FORTIFY_EMAIL -OutputFolder 'artifacts/fortify'"
 
-    - pwsh -NoProfile -Command "& {
-        scancentral `
-          -sscurl '$env:SSC_URL' `
-          -ssctoken '$env:SSC_TOKEN' `
-          start -upload `
-          -application '$env:APM_ID' `
-          -version '$env:SCAN_VERSION' `
-          -uptoken '$env:SSC_UPLOAD_TOKEN' `
-          -email '$env:FORTIFY_NOTIFICATION_DL' `
-          -bt none
-      }"
+    - pwsh -NoProfile -Command "& 'scancentral' -sscurl $env:SSC_URL -ssctoken $env:SSC_TOKEN start -upload -application $env:APM_ID -version $env:SCAN_VERSION -uptoken $env:SSC_UPLOAD_TOKEN -email $env:FORTIFY_NOTIFICATION_DL -bt none"
 
   artifacts:
     when: always
