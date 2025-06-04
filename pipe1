@@ -16,17 +16,20 @@ fortify-scan:
   script:
     - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
     - mkdir -p artifacts/fortify
-    - pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 \
-        -BuildId "12345678" \
-        -Source "." \
-        -Application "$APM_ID" \
-        -Version "$SCAN_VERSION" \
-        -Token "$FORTIFY_TOKEN" \
-        -Email "$FORTIFY_EMAIL" \
-        -OutputFolder "artifacts/fortify" \
+    - zip -r artifacts/fortify/source.zip . -x "artifacts/*"
+    - |
+      pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 `
+        -BuildId "12345678" `
+        -Source "." `
+        -Application "$APM_ID" `
+        -Version "$SCAN_VERSION" `
+        -Token "$FORTIFY_TOKEN" `
+        -Email "$FORTIFY_EMAIL" `
+        -OutputFolder "artifacts/fortify" `
         -Publish
-    - pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 \
-        -FortifyReportsDirectory "./artifacts/fortify" \
+    - |
+      pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 `
+        -FortifyReportsDirectory "./artifacts/fortify" `
         -FortifyJson "./.fortify.json"
   artifacts:
     when: always
