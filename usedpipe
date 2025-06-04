@@ -13,7 +13,6 @@ variables:
   SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
   SSC_UPLOAD_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
   FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
-  FORTIFY_VERSION: "$SCAN_VERSION"
 
 fortify-scan:
   stage: fortify
@@ -22,8 +21,6 @@ fortify-scan:
     - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
     - mkdir -p artifacts/fortify
     - zip -r artifacts/fortify/source.zip . -x "artifacts/*"
-
-    # Run initial PowerShell-based scan
     - |
       pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 `
         -BuildId "12345678" `
@@ -33,18 +30,10 @@ fortify-scan:
         -Token "$FORTIFY_TOKEN" `
         -Email "$FORTIFY_EMAIL" `
         -OutputFolder "artifacts/fortify"
-
-    # Optional: Post-process issues for GitLab view
-    - |
-      pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 `
-        -FortifyReportsDirectory "./artifacts/fortify" `
-        -FortifyJson "./.fortify.json"
-
-    # Upload to Fortify SSC
     - |
       scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -upload `
         -application "$APM_ID" `
-        -version "$FORTIFY_VERSION" `
+        -version "$SCAN_VERSION" `
         -uptoken "$SSC_UPLOAD_TOKEN" `
         -email "$FORTIFY_NOTIFICATION_DL" `
         -bt none
@@ -53,8 +42,5 @@ fortify-scan:
     when: always
     paths:
       - artifacts/fortify/
-      - .fortify.json
   tags:
     - apimhub
-  #rules:
-  #  - if: '$FORTIFY_SCAN == "true" && $CI_COMMIT_BRANCH == "develop"'
