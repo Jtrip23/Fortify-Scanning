@@ -1,44 +1,55 @@
+stages:
+  - fortify
+
+variables:
+  APM_ID: "APM0004849"
+  SCAN_VERSION: "1.1"
+  BUILD_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  DOTNET_NUGET_SIGNATURE_VERIFICATION: "false"
+  FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_EMAIL: "APIHub@fiserv.com"
+  SSC_URL: "https://fortify.example.com/ssc"
+  SSC_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  SSC_UPLOAD_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_NOTIFICATION_DL: "APIHub@fiserv.com"
+
 fortify-scan:
   stage: fortify
   image: "$BUILD_IMAGE:FMK-20250401T173337Z"
-
   script:
-    - echo "Cloning external repo..."
-    - git clone "$EXTERNAL_REPO" "$EXTERNAL_REPO_DIR"
-
-    - echo "Zipping source code from $EXTERNAL_REPO_DIR"
+    - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
     - mkdir -p artifacts/fortify
-    - zip -r artifacts/fortify/source.zip "$EXTERNAL_REPO_DIR"
+    - zip -r artifacts/fortify/source.zip . -x "artifacts/*"
 
-    - echo "Running Fortify scan"
-    - |
-      pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 `
-        -BuildId "ext-$(date +%s)" `
-        -Source "$EXTERNAL_REPO_DIR" `
-        -Application "$APM_ID" `
-        -Version "$SCAN_VERSION" `
-        -Token "$FORTIFY_TOKEN" `
-        -Email "$FORTIFY_EMAIL" `
-        -OutputFolder "artifacts/fortify"
+    # ✅ Run Fortify scan with PowerShell using $env vars properly
+    - pwsh -NoProfile -Command '
+        & "/etc/fortify/bin/Start-FortifyScan.ps1" `
+          -BuildId "12345678" `
+          -Source "." `
+          -Application $env:APM_ID `
+          -Version $env:SCAN_VERSION `
+          -Token $env:FORTIFY_TOKEN `
+          -Email $env:FORTIFY_EMAIL `
+          -OutputFolder "artifacts/fortify"
+      '
 
-    - |
-      pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 `
-        -FortifyReportsDirectory "./artifacts/fortify" `
-        -FortifyJson "./.fortify.json"
-
-    - |
-      scancentral -sscurl "$SSC_URL" -ssctoken "$SSC_TOKEN" start -upload `
-        -application "$APM_ID" `
-        -version "$FORTIFY_VERSION" `
-        -uptoken "$SSC_UPLOAD_TOKEN" `
-        -email "$FORTIFY_NOTIFICATION_DL" `
-        -bt none
+    # ✅ Upload scan to SSC
+    - pwsh -NoProfile -Command '
+        & scancentral `
+          -sscurl $env:SSC_URL `
+          -ssctoken $env:SSC_TOKEN `
+          start -upload `
+          -application $env:APM_ID `
+          -version $env:SCAN_VERSION `
+          -uptoken $env:SSC_UPLOAD_TOKEN `
+          -email $env:FORTIFY_NOTIFICATION_DL `
+          -bt none
+      '
 
   artifacts:
     when: always
     paths:
       - artifacts/fortify/
-      - .fortify.json
-
   tags:
     - apimhub
