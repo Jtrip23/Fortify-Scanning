@@ -2,11 +2,13 @@ stages:
   - fortify
 
 variables:
-  APM_ID: APM0008206
-  SCAN_VERSION: image-pull-secret-replicator
-  BUILD_IMAGE: fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build
+  APM_ID: "APM0004849"
+  SCAN_VERSION: "image-pull-secret-replicator"
+  BUILD_IMAGE: "fmk.nexus.onefiserv.net/fmk/dotnet/dotnet-8.0-build"
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
   DOTNET_NUGET_SIGNATURE_VERIFICATION: "false"
+  FORTIFY_TOKEN: "b190d1f5-d4b3-4708-8d36-19b7d8e6badc"
+  FORTIFY_EMAIL: "APIHub@fiserv.com"
 
 fortify-scan:
   stage: fortify
@@ -14,18 +16,28 @@ fortify-scan:
   script:
     - echo "Running Fortify scan for $APM_ID - $SCAN_VERSION"
     - mkdir -p artifacts/fortify
-    - pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 `
-        -BuildId "$CI_PIPELINE_ID" `
-        -Source . `
-        -Application "$APM_ID" `
-        -Version "$SCAN_VERSION" `
-        -Token "$FORTIFY_TOKEN" `
-        -Email "$FORTIFY_EMAIL" `
-        -OutputFolder artifacts/fortify `
-        -Publish
+
+    # Zip source code except artifacts
+    - zip -r artifacts/fortify/source.zip . -x "artifacts/*"
+
+    # Run Fortify scan via PowerShell, passing environment variables properly
+    - pwsh -NoProfile -Command "& {
+        /etc/fortify/bin/Start-FortifyScan.ps1 `
+          -BuildId '12345678' `
+          -Source '.' `
+          -Application '$env:APM_ID' `
+          -Version '$env:SCAN_VERSION' `
+          -Token '$env:FORTIFY_TOKEN' `
+          -Email '$env:FORTIFY_EMAIL' `
+          -OutputFolder 'artifacts/fortify' `
+          -Publish
+      }"
+
+    # Optional: Write issues to .fortify.json if you want to parse or store results
     - pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 `
-        -FortifyReportsDirectory ./artifacts/fortify `
-        -FortifyJson ./.fortify.json
+        -FortifyReportsDirectory "./artifacts/fortify" `
+        -FortifyJson "./.fortify.json"
+
   artifacts:
     when: always
     paths:
