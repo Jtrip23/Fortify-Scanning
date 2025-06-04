@@ -1,36 +1,28 @@
-$ pwsh -NoProfile -Command "& { /etc/fortify/bin/Start-FortifyScan.ps1 ` -BuildId '12345678' ` -Source '.' ` -Application '$env:APM_ID' ` -Version '$env:SCAN_VERSION' ` -Token '$env:FORTIFY_TOKEN' ` -Email '$env:FORTIFY_EMAIL' ` -OutputFolder 'artifacts/fortify' ` -Publish }"
-/scripts-26732-14957953/step_script: line 181: -BuildId: command not found
-/scripts-26732-14957953/step_script: line 181: -Application: command not found
-/scripts-26732-14957953/step_script: line 181: -Token: command not found
-/scripts-26732-14957953/step_script: line 181: -OutputFolder: command not found
+Problem 1:
+I think I misunderstood what was happening. I think Gitlab runs everything with sh. So maybe backslash in this case is right.
+ 
+Problem 2:
+Your YAML is still invalid.
+YAML
+script:
+  - |
+      pwsh foo bar baz \
+        more lines here \
+        more lines here
+Note it's just - | NOT - | -
+
+$ pwsh -NoProfile /etc/fortify/bin/Start-FortifyScan.ps1 ` # collapsed multi-line command
+/scripts-26732-14958139/step_script: line 182: -BuildId: command not found
 cmdlet Start-FortifyScan.ps1 at command pipeline position 1
 Supply values for the following parameters:
 BuildId: 
-Start-FortifyScan.ps1: Cannot process command because of one or more missing mandatory parameters: BuildId Application Token OutputFolder.
-$ pwsh -NoProfile ./build/pipeline/Write-FortifyIssues.ps1 ` -FortifyReportsDirectory "./artifacts/fortify" ` -FortifyJson "./.fortify.json"
-/scripts-26732-14957953/step_script: line 183: -FortifyReportsDirectory: command not found
-The argument './build/pipeline/Write-FortifyIssues.ps1' is not recognized as the name of a script file. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
-Usage: pwsh[.exe] [-Login] [[-File] <filePath> [args]]
-                  [-Command { - | <script-block> [-args <arg-array>]
-                                | <string> [<CommandParameters>] } ]
-                  [-CommandWithArgs <string> [<CommandParameters>]
-                  [-ConfigurationName <string>] [-ConfigurationFile <filePath>]
-                  [-CustomPipeName <string>] [-EncodedCommand <Base64EncodedCommand>]
-                  [-ExecutionPolicy <ExecutionPolicy>] [-InputFormat {Text | XML}]
-                  [-Interactive] [-MTA] [-NoExit] [-NoLogo] [-NonInteractive] [-NoProfile]
-                  [-NoProfileLoadTime] [-OutputFormat {Text | XML}] 
-                  [-SettingsFile <filePath>] [-SSHServerMode] [-STA] 
-                  [-Version] [-WindowStyle <style>] 
-                  [-WorkingDirectory <directoryPath>]
-       pwsh[.exe] -h | -Help | -? | /?
-PowerShell Online Help https://aka.ms/powershell-docs
-All parameters are case-insensitive.
+Start-FortifyScan.ps1: Cannot process command because of one or more missing mandatory parameters: BuildId Source Application Version Token Email OutputFolder.
 Uploading artifacts for failed job
-00:09
+00:10
 Uploading artifacts...
 artifacts/fortify/: found 2 matching artifact files and directories 
 WARNING: .fortify.json: no matching files. Ensure that the artifact path is relative to the working directory (/builds/na/corp/technology-services/apigee-ofs/fiserv_apigee_management_portal) 
-Uploading artifacts as "archive" to coordinator... 201 Created  id=14957953 responseStatus=201 Created token=glcbt-64
+Uploading artifacts as "archive" to coordinator... 201 Created  id=14958139 responseStatus=201 Created token=glcbt-64
 Cleaning up project directory and file based variables
-00:01
+00:00
 ERROR: Job failed: command terminated with exit code 1
